@@ -1,0 +1,1015 @@
+openapi: 3.0.3
+info:
+  title: sdmay23-40 Interactive Classroom Backend - OpenAPI 3.0
+  description: |-
+    These are the api documents for the sdmay23-40 backend
+    Some useful links:
+    - [sdmay23-40 repository](https://git.ece.iastate.edu/sd/sdmay23-40)
+  contact:
+    email: miller.tyler094@gmail.com
+  version: 1.0.0
+servers:
+  - url: https://sdmay23-40.ece.iastate.edu/api
+tags:
+  - name: user
+    description: User api routes
+  - name: message
+    description: Message api routes
+  - name: course
+    description: course api routes
+  - name: lecture
+    description: lecture api routes
+  - name: poll
+    description: poll api routes
+  - name: role
+    description: role api routes
+  
+paths:
+  /user:
+    post:
+      tags:
+        - user
+      summary: Add a new user to the system
+      description: Add a new user to the system
+      operationId: addUser
+      parameters:
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: Create a new user in the system
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: integer
+                    example: 2
+        '403':
+          description: Invalid Session
+        '404':
+          description: Invalid Body
+        '500':
+          description: Internal Server Error
+    get:
+      tags:
+        - user
+      summary: get user info
+      description: get a users info by their id
+      operationId: getUserInfo
+      parameters:
+        - in: query
+          required: true
+          name: id
+          schema:
+            type: integer
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: integer
+                    example: 2
+                  email:
+                    type: string
+                    example: twmiller@iastate.edu
+                  first_name:
+                    type: string
+                  last_name: 
+                    type: string
+        '400':
+          description: Invalid Parameters
+        '403':
+          description: Invalid Session
+        '500':
+          description: Internal Server Error
+  /user/login:
+    post:
+      tags:
+        - user
+      summary: logs given user into system
+      description: Logs user in, creates session, and returns session
+      operationId: login
+      requestBody:
+        description: Create a new user in the system
+        content:
+          application/json:
+            schema:
+              properties:
+                netId:
+                  type: string
+                  example: twiller
+                password:
+                  type: string
+                  example: password
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: integer
+                    example: 1
+                  sessionId:
+                    type: string
+                    example: kjsahfkdsjhksdGjsjfjdwkj
+                  userRoles:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        role_id:
+                          type: number
+                        course_id:
+                          type: number
+                        course_name:
+                          type: string
+                        role:
+                          type: string
+        '400':
+          description: Invalid Body
+        '401':
+          description: Incorrect Username or Password
+        '500':
+          description: Internal Server Error
+  /user/logout:
+    post:
+      tags:
+        - user
+      summary: logs given user out of system
+      operationId: logout
+      parameters:
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Logged Out
+        '403':
+          description: Invalid Session
+        '500':
+          description: Internal Server Error
+  /course:
+    get:
+      tags:
+        - course
+      summary: get course info
+      description: get a courses info by their id
+      operationId: getCourseInfo
+      parameters:
+        - in: query
+          required: true
+          name: course_id
+          schema:
+            type: integer
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  course_id:
+                    type: integer
+                    example: 2
+                  owner_id:
+                    type: integer
+                    example: 1
+                  course_name:
+                    type: string
+                    example: EE 201
+        '400':
+          description: Invalid Parameters
+        '403':
+          description: Invalid Session
+        '500':
+          description: Internal Server Error
+    post:
+      tags:
+        - course
+      summary: adds a new course to the system
+      operationId: Create a new course
+      parameters:
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: Create a new course in the system
+        content:
+          application/json:
+            schema:
+              properties:
+                owner_id:
+                  type: integer
+                  example: 2
+                course_title:
+                  type: string
+                  example: Course 2
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  course_id:
+                    type: integer
+                    example: 1
+        '400':
+          description: Invalid Body
+        '403':
+          description: Invalid Session
+        '500':
+          description: Internal Server Error
+  /lecture:
+    get:
+      tags:
+        - lecture
+      summary: get Lecture info
+      description: get a Lectures info by their id
+      operationId: getLectureInfo
+      parameters:
+        - in: query
+          required: true
+          name: lecture_id
+          schema:
+            type: integer
+        - in: query
+          required: true
+          name: course_id
+          schema:
+            type: integer
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lecture_id:
+                    type: integer
+                    example: 2
+                  course_id:
+                    type: integer
+                    example: 1
+                  title:
+                    type: string
+                    example: Lecture 15
+        '400':
+          description: Invalid Parameters
+        '401':
+          description: Unauthorized
+        '403':
+          description: Invalid Session
+        '500':
+          description: Internal Server Error
+    post:
+      tags:
+        - lecture
+      summary: adds a new lecture to the system
+      parameters:
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: Create a new lecture in the system
+        content:
+          application/json:
+            schema:
+              properties:
+                title:
+                  type: string
+                  example: Lecture 1
+                course_id:  
+                  type: integer
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lecture_id:
+                    type: integer
+                    example: 1
+        '400':
+          description: Invalid Body
+        '401':
+          description: Unauthorized
+        '403':
+          description: Invalid Session
+        '500':
+          description: Internal Server Error
+  /lecture/live:
+    get:
+      tags:
+        - lecture
+      summary: get Lecture live status
+      operationId: isLectureLive
+      parameters:
+        - in: query
+          required: true
+          name: lecture_id
+          schema:
+            type: integer
+        - in: query
+          required: true
+          name: course_id
+          schema:
+            type: integer
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lecture_id:
+                    type: integer
+                    example: 2
+                  live:
+                    type: boolean
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /role:
+    get:
+      tags:
+        - role
+      summary: get role info
+      description: get a roles info by their id
+      operationId: getRole
+      parameters:
+        - in: query
+          required: true
+          name: role_id
+          schema:
+            type: integer
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role_id:
+                    type: integer
+                    example: 2
+                  course_id:
+                    type: integer
+                    example: 1
+                  user_id:
+                    type: integer
+                    example: 4
+                  role: 
+                    type: string 
+                    example: PROFESSOR | TA | STUDENT
+        '400':
+          description: Invalid Parameters
+        '401':
+          description: Unauthorized
+        '403':
+          description: Invalid Session
+        '500':
+          description: Internal Server Error
+    post:
+      tags:
+        - role
+      summary: Adds a new role to the system
+      parameters:
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: Create a new role in the system
+        content:
+          application/json:
+            schema:
+              properties:
+                course_id:
+                  type: integer
+                  example: 2
+                user_id:
+                  type: integer
+                  example: 2
+                role:
+                  type: string
+                  example: STUDENT/TA/PROFESSOR
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rollID:
+                    type: integer
+                    example: 1
+        '400':
+          description: Invalid Body
+        '401':
+          description: Unauthorized
+        '403':
+          description: Invalid Session
+        '500':
+          description: Internal Server Error
+  /poll-response:
+    get:
+      tags:
+        - poll
+        - poll-response
+      summary: get poll-response info
+      description: get a poll-responses info by their id
+      operationId: getPollResponseInfo
+      parameters:
+        - in: query
+          required: true
+          name: poll_response_id
+          schema:
+            type: integer
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  poll_response_id:
+                    type: integer
+                    example: 2
+                  user_id:
+                    type: integer
+                    example: 1
+                  response_id:
+                    type: integer
+                    example: 4
+                  poll_id: 
+                    type: integer 
+                    example: 5
+                  timestamp: 
+                    type: integer
+                    example: 21094832850
+        '400':
+          description: Invalid Parameters
+        '403':
+          description: Invalid Session
+        '500':
+          description: Internal Server Error
+    post:
+      tags:
+        - poll-response
+        - poll
+      summary: Adds a new poll-response to the system
+      parameters:
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: Create a new poll-response in the system
+        content:
+          application/json:
+            schema:
+              properties:
+                course_id:
+                  type: integer
+                choice_id:
+                  type: integer
+                  example: 44
+                poll_id:
+                  type: string
+                  example: 91
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pollResponseID:
+                    type: integer
+                    example: 24
+        '400':
+          description: Invalid Body
+        '401':
+          description: Unauthorized
+        '403':
+          description: Invalid Session
+        '500':
+          description: Internal Server Error
+  /poll/close:
+    patch:
+      tags:
+        - poll
+      summary: closes a poll
+      parameters:
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: poll_id
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: course_id
+          schema:
+            type: string
+          required: true
+      responses:
+        '204':
+          description: Success
+        '400':
+          description: Invalid Body
+        '401':
+          description: Unauthorized
+        '403':
+          description: Invalid Session
+        '500':
+          description: Internal Server Error
+  /poll/metrics:
+    get:
+      tags:
+        - poll
+      summary: gets a polls metrics
+      parameters:
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: poll_id
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: course_id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalRespondants:
+                    type: integer
+                  correctResponses:
+                    type: integer
+                  userResponses:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        user_id: 
+                          type: integer
+                        poll_choice_id:
+                          type: integer
+                        is_correct_choice:
+                          type: boolean
+
+          description: Success
+        '400':
+          description: Invalid Body
+        '401':
+          description: User is not associated with course
+        '403':
+          description: Invalid Session
+        '500':
+          description: Internal Server Error
+  /poll:
+    post:
+        tags:
+          - poll
+        summary: Adds a new poll to the system
+        parameters:
+          - in: header
+            name: x-session-id
+            schema:
+              type: string
+            required: true
+        requestBody:
+          description: Create a new poll in the system
+          content:
+            application/json:
+              schema:
+                properties:
+                  course_id:
+                    type: integer
+                  lecture_id:
+                    type: integer
+                  question_text:
+                    type: string
+                  poll_choices:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        choice_text:
+                          type: string
+                        is_correct_choice:
+                          type: string
+                      
+          required: true
+        responses:
+          '201':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    pollId:
+                      type: integer
+                    pollChoiceIds:
+                      type: array
+                      items:
+                        type: integer
+          '400':
+            description: Invalid Body
+          '401':
+            description: Unauthorized
+          '403':
+            description: Invalid Session
+          '500':
+            description: Internal Server Error
+  /message:
+    get:
+      tags:
+        - message
+      summary: get message info
+      description: get a messages info by their id
+      operationId: getMessageInfo
+      parameters:
+        - in: query
+          required: true
+          name: message_id
+          schema:
+            type: integer
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message_id:
+                    type: integer
+                    example: 2
+                  parent_id:
+                    type: integer
+                    example: 1 | null
+                  sender_id:
+                    type: integer
+                    example: 4
+                  course_id:
+                    type: integer
+                  lecture_id: 
+                    type: integer 
+                    example: 3
+                  timestamp:
+                    type: integer
+                    example: 14209584209509
+                  is_anonymous:
+                    type: boolean
+                    example: true
+                  body: 
+                    type: string
+                    example: 'Hello everyone!'
+        '400':
+          description: Invalid Parameters
+        '403':
+          description: Invalid Session
+        '500':
+          description: Internal Server Error
+    post:
+      tags:
+        - message
+      summary: adds a new message to the system
+      requestBody:
+        description: Create a new message in the system
+        content:
+          application/json:
+            schema:
+              properties:
+                body:
+                  type: string
+                  example: This is a message
+                lecture_id:
+                  type: integer
+                  example: 1
+                is_anonymous:
+                  type: boolean
+                  example: false
+                parent_id:
+                  type: integer
+                  example: null
+                course_id:
+                  description: Required if has_media is true
+                  type: integer
+                  example: 5
+                has_media:
+                  type: boolean
+                  example: true
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message_id:
+                    type: integer
+                    example: 1
+        '400':
+          description: Invalid Body
+        '401':
+          description: Unauthorized
+        '403':
+          description: Invalid Session
+        '500':
+          description: Internal Server Error
+  /message/messagesByLecture:
+    get:
+      tags:
+        - message
+      summary: gets all messages and polls for a lecture
+      description: gets all messages and polls for a lecture
+      operationId: getMessagesAndPollsByLectureId
+      parameters:
+        - in: query
+          required: true
+          name: lecture_id
+          schema:
+            type: string
+        - in: query
+          required: false
+          name: timestamp
+          schema:
+            type: string
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                  type: array
+                  items:
+                    anyOf:
+                      - $ref: '#/components/schemas/Message'
+                      - $ref: '#/components/schemas/Poll'
+        '400':
+          description: Invalid Parameters
+        '403':
+          description: Invalid Session
+        '500':
+          description: Internal Server Error
+  /download-media:
+    get:
+      tags:
+        - media
+      summary: download media
+      description: download media by media_id & course_id
+      operationId: downloadMedia
+      parameters:
+        - in: query
+          required: true
+          name: course_id
+          schema:
+            type: integer
+        - in: query
+          required: true
+          name: media_id
+          schema:
+            type: integer
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+  /upload-media:
+    post:
+      tags:
+        - media
+      summary: stores a new media file associated with a message
+      parameters:
+        - in: query
+          required: true
+          name: media_id
+          schema:
+            type: integer
+        - in: query
+          required: true
+          name: course_id
+          schema:
+            type: integer
+        - in: header
+          required: true
+          name: Content-Type
+          description: Must be set to the sent image's correct MIME type (e.g. "image/png"... etc.)
+          schema:
+            type: integer
+        - in: header
+          name: x-session-id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: The binary blob of the file
+        content:
+          application/json:
+            schema:
+              properties:
+                body:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: "Image successfully saved"
+        '401':
+            description: Unauthorized
+        '403':
+            description: Invalid Session
+        '500':
+            description: Internal Server Error
+
+components:
+  schemas:
+    Message:
+      type: object
+      properties:
+        sender_id:
+          type: integer
+          example: 2
+        timestamp:
+          type: string
+          example: 2017-07-23 13:10:11
+        role: 
+          type: string
+          example: owner
+        netId:
+          type: string
+          example: twmiller
+        body: 
+          type: string
+          example: This is an example message
+        is_anonymous:
+          type: boolean
+          example: false
+        parent_id:
+          type: integer
+          example: 3 | null
+        message_id:
+          type: integer
+          example: 2
+    Poll:
+      type: object
+      properties:
+        poll_id:
+          type: integer
+          example: 2
+        timestamp:
+          type: string
+          example: 2017-07-23 13:10:11
+        question:
+          type: string
+          example: what is the speed of gravity?
+        close_date:
+          type: string
+          nullable: true
+        is_open:
+          type: boolean
+        choices:
+          type: array
+          items:
+            type: object
+            properties:
+              poll_choice_id:
+                type: integer
+                example: 1
+              text:
+                type: string
+                example: 9.82m/s^2
+              is_correct:
+                type: boolean
+                example: true
+    User:
+      type: object
+      properties:
+        netid:
+          type: string
+          example: username
+        password:
+          type: string
+          example: password
+        first_name:
+          type: string
+        last_name:
+          type: string

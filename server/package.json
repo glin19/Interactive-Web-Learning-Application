@@ -1,0 +1,41 @@
+{
+  "name": "server",
+  "version": "0.0.0",
+  "description": "Express Application for Interactive Learning Tool Server",
+  "main": "index.js",
+  "scripts": {
+    "start": "bash .bin/start_local.sh",
+    "start:server": "bash .bin/start_server.sh",
+    "test": "jest test",
+    "build:local": "bash .bin/build_docker.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.ece.iastate.edu/sd/sdmay23-40.git"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.1",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.1",
+    "express-mysql-session": "^2.1.8",
+    "express-session": "^1.17.3",
+    "fs": "^0.0.1-security",
+    "https": "^1.0.0",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.20",
+    "path": "^0.12.7",
+    "pm2": "^5.2.2",
+    "util": "^0.12.4",
+    "uuid": "^9.0.0",
+    "ws": "^8.10.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.3"
+  }
+}
